@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: cmd/server/Dockerfile
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  worker:
+    build:
+      context: .
+      dockerfile: cmd/worker/Dockerfile
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - server
+    restart: unless-stopped
